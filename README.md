@@ -3,7 +3,7 @@ The aim of the project is to implement different optimization algorithms for log
 
 ## Part 1
 
-* Finding $5$ different datasets with binary class variable. We can use [Datasets archive](https://archive.ics.uci.edu/). 
+* Finding 5 different datasets with binary class variable. We can use [Datasets archive](https://archive.ics.uci.edu/). 
 * Preparing data: missing values, converting categorical variables (e.g. one-hot encoding), removing colinear variables, split data into training and testing sets
 
 ## Part 2
