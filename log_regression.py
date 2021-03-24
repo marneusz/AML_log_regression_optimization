@@ -45,7 +45,7 @@ class LogisticModel(object):
         self.opt_alg = opt_alg
         self.weights = np.ones(self.X.shape[1]).reshape(self.X.shape[1], 1)
 
-    def fit(self, n_epochs, opt_alg):
+    def fit(self, n_epochs):
         ...
 
     def IRLS(self, n_epochs, eps):
