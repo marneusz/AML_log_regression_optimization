@@ -35,18 +35,16 @@ def cost_function(beta, x, y):
 
 
 class LogisticModel(object):
-    """
-
-    """
-    def __init__(self, var_names, X, y, opt_alg):
-        self.var_names = var_names
+    def __init__(self, X: pd.DataFrame, y: pd.DataFrame, opt_alg):
+        self.var_names = X.columns
         self.X = np.c_[np.ones((X.shape[0], 1)), X]  # adding bias
         self.y = y
         self.opt_alg = opt_alg
         self.weights = np.ones(self.X.shape[1]).reshape(self.X.shape[1], 1)
 
-    def fit(self, n_epochs):
-        ...
+    def fit(self, X):
+        X = np.c_[np.ones((X.shape[0], 1)), X]
+        return predict_probabilities(self.weights, X).apply_along_axis(np.round, axis=1)
 
     def IRLS(self, n_epochs, eps):
         # IN PROGRESS...
@@ -65,8 +63,8 @@ class LogisticModel(object):
             prev_delta = delta
 
     def GD(self, n_epochs, learning_rate):
-        ...
+        pass
 
     def SGD(self, n_epochs, learning_rate):
-        ...
+        pass
 
