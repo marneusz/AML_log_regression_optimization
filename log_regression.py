@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
 # Following functions can be placed in class LogisticModel
@@ -37,10 +37,10 @@ def cost_function(beta, x, y):
 class LogisticModel(object):
     def __init__(self, X: pd.DataFrame, y: pd.DataFrame, opt_alg):
         self.var_names = X.columns
-        self.X = np.c_[np.ones((X.shape[0], 1)), X]  # adding bias
-        self.y = y
+        self.X = np.c_[np.ones((X.shape[0], 1)), np.array(X)]  # adding bias
+        self.y = np.array(y)
         self.opt_alg = opt_alg
-        self.weights = np.ones(self.X.shape[1]).reshape(self.X.shape[1], 1)
+        self.weights = np.random.randn(self.X.shape[1], 1)
 
     def fit(self, X):
         X = np.c_[np.ones((X.shape[0], 1)), X]
