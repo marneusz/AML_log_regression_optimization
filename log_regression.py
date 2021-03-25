@@ -42,9 +42,18 @@ class LogisticModel(object):
         self.opt_alg = opt_alg
         self.weights = np.random.randn(self.X.shape[1], 1)
 
-    def fit(self, X):
+    def fit(self, X: pd.DataFrame, return_probabilities: bool = False) -> pd.DataFrame:
+        """
+        Returns class to which t
+        :param X: input dataframe
+        :param return_probabilities: should the model return probabilities of belonging to class 1?
+        :return: vector of 1 and 0, which represents predicted classes
+        """
         X = np.c_[np.ones((X.shape[0], 1)), X]
-        return predict_probabilities(self.weights, X).apply_along_axis(np.round, axis=1)
+        if return_probabilities:
+            return predict_probabilities(self.weights, X)
+        else:
+            return predict_probabilities(self.weights, X).apply_along_axis(np.round, axis=1)
 
     def IRLS(self, n_epochs, eps):
         # IN PROGRESS...
