@@ -34,6 +34,55 @@ def cost_function(beta, x, y):
     return -(1/m)*np.sum(y*np.log(h) + (1-y)*np.log(1-h))
 
 
+def accuracy(y: np.array, prediction: np.array) -> float:
+    """
+    Given two vectors consisting of 0 and 1, returns accuracy.
+    :param y: true values (0 and 1)
+    :param prediction: prediciton (0 and 1)
+    :return: accuracy
+    """
+    return np.mean(y == prediction)
+
+
+def precision(y: np.array, prediction: np.array) -> float:
+    """
+    Given two vectors consisting of 0 and 1, returns precision.
+    We assume that 1 represents positive value.
+    :param y: true values (0 and 1)
+    :param prediction: prediciton (0 and 1)
+    :return: precision
+    """
+    true_positives = np.sum((y == 1) & (prediction == 1))
+    positives = np.sum(prediction)
+    return 0 if positives == 0 else true_positives / positives
+
+
+def recall(y: np.array, prediction: np.array) -> float:
+    """
+    Given two vectors consisting of 0 and 1, returns recall.
+    We assume that 1 represents positive value.
+    :param y: true values (0 and 1)
+    :param prediction: prediciton (0 and 1)
+    :return: recall
+    """
+    true_positives = np.sum((y == 1) & (prediction == 1))
+    true_values = np.sum(y)
+    return 0 if true_values == 0 else true_positives / true_values
+
+
+def F_measure(y: np.array, prediction: np.array) -> float:
+    """
+    Given two vectors consisting of 0 and 1, returns the F measure.
+    We assume that 1 represents positive value.
+    :param y: true values (0 and 1)
+    :param prediction: prediciton (0 and 1)
+    :return: recall
+    """
+    r = recall(y, prediction)
+    p = precision(y, prediction)
+    return 0 if r + p == 0 else 2 * r * p / (r + p)
+
+
 class LogisticModel(object):
     def __init__(self, X: pd.DataFrame, y: pd.DataFrame, opt_alg):
         self.var_names = X.columns
