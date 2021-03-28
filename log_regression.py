@@ -84,18 +84,25 @@ def F_measure(y: np.array, prediction: np.array) -> float:
 
 
 class LogisticModel(object):
-    """
-
-    """
-    def __init__(self, var_names, X, y, opt_alg):
-        self.var_names = var_names
-        self.X = np.c_[np.ones((X.shape[0], 1)), X]  # adding bias
-        self.y = y
+    def __init__(self, X: pd.DataFrame, y: pd.DataFrame, opt_alg):
+        self.var_names = X.columns
+        self.X = np.c_[np.ones((X.shape[0], 1)), np.array(X)]  # adding bias
+        self.y = np.array(y)
         self.opt_alg = opt_alg
-        self.weights = np.ones(self.X.shape[1]).reshape(self.X.shape[1], 1)
+        self.weights = np.random.randn(self.X.shape[1], 1)
 
-    def fit(self, n_epochs):
-        ...
+    def fit(self, X: pd.DataFrame, return_probabilities: bool = False) -> pd.DataFrame:
+        """
+        Returns class to which t
+        :param X: input dataframe
+        :param return_probabilities: should the model return probabilities of belonging to class 1?
+        :return: vector of 1 and 0, which represents predicted classes
+        """
+        X = np.c_[np.ones((X.shape[0], 1)), X]
+        if return_probabilities:
+            return predict_probabilities(self.weights, X)
+        else:
+            return predict_probabilities(self.weights, X).apply_along_axis(np.round, axis=1)
 
     def IRLS(self, n_epochs, eps):
         # IN PROGRESS...
@@ -118,3 +125,4 @@ class LogisticModel(object):
 
     def SGD(self, n_epochs, learning_rate):
         pass
+
