@@ -1,9 +1,8 @@
 import numpy as np
 import pandas as pd
-#import matplotlib.pyplot as plt
-
 
 # Following functions can be placed in class LogisticModel
+
 
 def sigmoid(x):
     """
@@ -11,9 +10,7 @@ def sigmoid(x):
     :param x: array of arguments
     :return: sigmoid of x
     """
-    return np.where(x >= 0,
-                    1 / (1 + np.exp(-x)),
-                    np.exp(x) / (1 + np.exp(x)))
+    return np.where(x >= 0, 1 / (1 + np.exp(-x)), np.exp(x) / (1 + np.exp(x)))
 
 
 def predict_probabilities(beta, x):
@@ -31,7 +28,7 @@ def cost_function(beta, x, y):
     """
     m = x.shape[0]
     h = predict_probabilities(beta, x)
-    return -(1/m)*np.sum(y*np.log(h) + (1-y)*np.log(1-h))
+    return -(1 / m) * np.sum(y * np.log(h) + (1 - y) * np.log(1 - h))
 
 
 def accuracy(y: np.array, prediction: np.array) -> float:
@@ -83,8 +80,8 @@ def F_measure(y: np.array, prediction: np.array) -> float:
     return 0 if r + p == 0 else 2 * r * p / (r + p)
 
 
-class LogisticModel(object):
-    def __init__(self, X: pd.DataFrame, y: pd.DataFrame, opt_alg):
+class LogisticModel:
+    def __init__(self, X: pd.DataFrame, y: pd.DataFrame, opt_alg=None):
         self.var_names = X.columns
         self.X = np.c_[np.ones((X.shape[0], 1)), np.array(X)]  # adding bias
         self.y = np.array(y)
@@ -102,7 +99,9 @@ class LogisticModel(object):
         if return_probabilities:
             return predict_probabilities(self.weights, X)
         else:
-            return predict_probabilities(self.weights, X).apply_along_axis(np.round, axis=1)
+            return np.apply_along_axis(
+                np.round, arr=predict_probabilities(self.weights, X), axis=1
+            )
 
     def IRLS(self, n_epochs, eps):
         # IN PROGRESS...
@@ -120,9 +119,14 @@ class LogisticModel(object):
             self.weights -= delta
             prev_delta = delta
 
-    def GD(self, n_epochs, learning_rate):
-        pass
+    def GD(self, n_epochs=100, learning_rate=0.05):
+        for _ in range(n_epochs):
+            prediction = predict_probabilities(self.weights, self.X)
+            delta = np.matmul(
+                self.X.transpose(),
+                (prediction - self.y) * prediction * (1 - prediction),
+            )
+            self.weights -= delta * learning_rate
 
     def SGD(self, n_epochs, learning_rate):
         pass
-
