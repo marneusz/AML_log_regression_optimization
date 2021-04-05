@@ -128,5 +128,11 @@ class LogisticModel:
             )
             self.weights -= delta * learning_rate
 
-    def SGD(self, n_epochs, learning_rate):
+    def SGD(self, n_epochs, learning_rate = 0.05):
         pass
+
+    def log_likelihood(self) -> float:
+        """Returns the log-likelihood value for the model, based on weights"""
+        sigm = predict_probabilities(self.weights, self.X)  # sigmoid(beta * x)
+        temp = self.y * np.log(sigm) + (1 - self.y) * np.log(1 - sigm)
+        return np.sum(temp)
