@@ -1,13 +1,13 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn import preprocessing
 
 cancer = pd.read_csv('data/before preprocessing/breast_cancer.csv')
 candy = pd.read_csv('data/before preprocessing/candy.csv')
 nba = pd.read_csv('data/before preprocessing/nba.csv')
 wine = pd.read_csv('data/before preprocessing/wine.csv')
 bankrupcy = pd.read_csv('data/before preprocessing/bankrupcy.csv')
-
 
 # filling all missing values with mean value (column-wise)
 cancer = cancer.fillna(cancer.mean())
@@ -16,6 +16,13 @@ nba = nba.fillna(nba.mean())
 wine = wine.fillna(wine.mean())
 bankrupcy = bankrupcy.fillna(bankrupcy.mean())
 
+# One hot  encoding
+encoder = preprocessing.OneHotEncoder()
+sector = encoder.fit_transform(bankrupcy[['SECTOR']])
+bankrupcy = pd.concat([bankrupcy, pd.DataFrame(sector.todense(),
+                                               columns=encoder.categories_[0])], axis=1)
+bankrupcy = bankrupcy.drop(columns='SECTOR')
+candy = candy.drop(columns='competitorname')
 # dropping string column
 nba = nba.drop(columns='Name')
 
