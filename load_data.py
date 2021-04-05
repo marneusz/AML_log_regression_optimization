@@ -1,21 +1,32 @@
 import pandas as pd
-import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn import preprocessing
 
-cancer = pd.read_csv('data/before decorrelation/breast_cancer.csv')
-candy = pd.read_csv('data/before decorrelation/candy.csv')
-nba = pd.read_csv('data/before decorrelation/nba.csv')
-wine = pd.read_csv('data/before decorrelation/wine.csv')
+cancer = pd.read_csv('data/before preprocessing/breast_cancer.csv')
+candy = pd.read_csv('data/before preprocessing/candy.csv')
+nba = pd.read_csv('data/before preprocessing/nba.csv')
+wine = pd.read_csv('data/before preprocessing/wine.csv')
+bankrupcy = pd.read_csv('data/before preprocessing/bankrupcy.csv')
 
+# filling all missing values with mean value (column-wise)
+cancer = cancer.fillna(cancer.mean())
+candy = candy.fillna(candy.mean())
+nba = nba.fillna(nba.mean())
+wine = wine.fillna(wine.mean())
+bankrupcy = bankrupcy.fillna(bankrupcy.mean())
 
-# this dataset has null values in one column ('EXP_CEO')
-# I will create a column indicating if the value is missing and replace NA's with mean
-bankrupcy = pd.read_csv('data/before decorrelation/bankrupcy.csv')
-bankrupcy['EXP_CEO_NA'] = bankrupcy['EXP_CEO'].isna().astype(int)
-bankrupcy['EXP_CEO'] = bankrupcy['EXP_CEO'].replace(np.nan, bankrupcy['EXP_CEO'].mean())
+# One hot  encoding
+encoder = preprocessing.OneHotEncoder()
+sector = encoder.fit_transform(bankrupcy[['SECTOR']])
+bankrupcy = pd.concat([bankrupcy, pd.DataFrame(sector.todense(),
+                                               columns=encoder.categories_[0])], axis=1)
+bankrupcy = bankrupcy.drop(columns='SECTOR')
+candy = candy.drop(columns='competitorname')
+# dropping string column
+nba = nba.drop(columns='Name')
 
-# Corplots before decorelation
+# Corplots before decorrelation
 plt.figure(figsize=(10, 8))
 sns.heatmap(cancer.corr(), annot=True, fmt='.2f')
 plt.title('The cancer set before decorrelation')
@@ -40,6 +51,14 @@ nba = nba.drop(columns=['MIN', 'PTS', 'FGM', 'FTA', 'DREB', 'REB', '3PA'])
 wine = wine.drop(columns=['Flavanoids'])
 bankrupcy = bankrupcy.drop(columns=['MARKETING_SPENDING'])
 
+
+#saving
+
+candy.to_csv('data/after preprocessing/candy.csv', index=False)
+cancer.to_csv('data/after preprocessing/breast_cancer.csv', index=False)
+nba.to_csv('data/after preprocessing/nba.csv', index=False)
+wine.to_csv('data/after preprocessing/wine.csv', index=False)
+bankrupcy.to_csv('data/after preprocessing/bankrupcy.csv', index=False)
 
 # Corplots after decorelation
 plt.figure(figsize=(10, 8))
