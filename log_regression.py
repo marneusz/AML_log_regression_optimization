@@ -103,20 +103,23 @@ class LogisticModel:
                 np.round, arr=predict_probabilities(self.weights, X), axis=1
             )
 
-    def IRLS(self, n_epochs, eps):
-        # IN PROGRESS...
+    def IRLS(self, n_epochs=100, eps=1e-06, print_progress=False):
         # based on chapter 4.3.3 from Bishop - Pattern Recognition And Machine Learning
-        y = self.y.reshape(self.y.size, 1)
         prev_delta = np.zeros(self.X.shape[1]).reshape(self.X.shape[1], 1)
+        y = self.y.reshape(self.y.size, 1)
         for i in range(n_epochs):
             y_ = predict_probabilities(self.weights, self.X)
             R = np.identity(y_.size)
             R = R * (y_ * (1 - y_))
             delta = np.linalg.inv(self.X.T.dot(R).dot(self.X)).dot(self.X.T.dot(y_ - y))
-            if np.linalg.norm(delta - prev_delta) < eps:
-                # maybe some info about number of iterations
-                break
             self.weights -= delta
+
+            if print_progress:
+                print(f"Number of epoch: {i+1}/{n_epochs}")
+
+            if np.linalg.norm(delta - prev_delta) < eps:
+                print(f"Algorithm converged after {i+1} iterations")
+                break
             prev_delta = delta
 
     def GD(self, n_epochs=100, learning_rate=0.05):
