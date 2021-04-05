@@ -14,7 +14,7 @@ def sigmoid(x):
 
 
 def predict_probabilities(beta, x):
-    z = np.dot(x, beta)
+    z = np.dot(x, beta).reshape(x.shape[0], 1)
     return np.apply_along_axis(sigmoid, axis=1, arr=z)
 
 
@@ -86,7 +86,7 @@ class LogisticModel:
         self.X = np.c_[np.ones((X.shape[0], 1)), np.array(X)]  # adding bias
         self.y = np.array(y)
         self.opt_alg = opt_alg
-        self.weights = np.random.randn(self.X.shape[1], 1)
+        self.weights = np.zeros((self.X.shape[1], 1))
 
     def fit(self, X: pd.DataFrame, return_probabilities: bool = False) -> pd.DataFrame:
         """
