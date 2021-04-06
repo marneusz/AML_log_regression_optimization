@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from copy import copy
-
+from sklearn.preprocessing import MinMaxScaler
 # Following functions can be placed in class LogisticModel
 
 
@@ -84,11 +84,15 @@ def F_measure(y: np.array, prediction: np.array) -> float:
 class LogisticModel:
     def __init__(self, X: pd.DataFrame, y: pd.DataFrame, opt_alg=None):
         self.var_names = X.columns
+        self.scaler = MinMaxScaler()
+        X = self.scaler.fit_transform(X)
+        # we save only the scaler of X as an attribute, the scaler of y won't be used anymore
+        # it is need only once (for example for transforming y with classess 1,2 to 0,1)
+        y = MinMaxScaler().fit_transform(y)
         self.X = np.c_[np.ones((X.shape[0], 1)), np.array(X)]  # adding bias
         self.y = np.array(y)
         self.opt_alg = opt_alg
         self.weights = np.zeros((self.X.shape[1], 1))
-
     def fit(self, X: pd.DataFrame, return_probabilities: bool = False) -> pd.DataFrame:
         """
         Returns class to which t
@@ -96,6 +100,7 @@ class LogisticModel:
         :param return_probabilities: should the model return probabilities of belonging to class 1?
         :return: vector of 1 and 0, which represents predicted classes
         """
+        X = self.scaler.transform(X)
         X = np.c_[np.ones((X.shape[0], 1)), X]
         if return_probabilities:
             return predict_probabilities(self.weights, X)
