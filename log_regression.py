@@ -103,9 +103,11 @@ class LogisticModel:
                 np.round, arr=predict_probabilities(self.weights, X), axis=1
             )
 
-    def IRLS(self, n_epochs=100, eps=1e-06, print_progress=False):
+    def IRLS(self, n_epochs=100, eps=None, print_progress=False):
         # based on chapter 4.3.3 from Bishop - Pattern Recognition And Machine Learning
-        prev_delta = np.zeros(self.X.shape[1]).reshape(self.X.shape[1], 1)
+        if not (eps is None):
+            prev_weights = self.weights
+
         y = self.y.reshape(self.y.size, 1)
         for i in range(n_epochs):
             y_ = predict_probabilities(self.weights, self.X)
@@ -117,13 +119,16 @@ class LogisticModel:
             if print_progress:
                 print(f"Number of epoch: {i+1}/{n_epochs}")
 
-            if np.linalg.norm(delta - prev_delta) < eps:
-                print(f"Algorithm converged after {i+1} iterations")
-                break
-            prev_delta = delta
+            if not (eps is None):
+                if np.linalg.norm(self.weights - prev_weights) < eps:
+                    print(f"Algorithm converged after {i + 1} iterations")
+                    break
+                prev_weights = self.weights
 
-    def GD(self, n_epochs=100, learning_rate=0.05, eps=1e-06):
-        prev_delta = np.zeros(self.X.shape[1]).reshape(self.X.shape[1], 1)
+    def GD(self, n_epochs=100, learning_rate=0.05, eps=None):
+        if not (eps is None):
+            prev_weights = self.weights
+
         for i in range(n_epochs):
             prediction = predict_probabilities(self.weights, self.X)
             delta = np.matmul(
@@ -132,16 +137,16 @@ class LogisticModel:
             )
             self.weights -= delta * learning_rate
 
-            if np.linalg.norm(delta - prev_delta) < eps:
-                print(f"Algorithm converged after {i+1} iterations")
-                break
-            prev_delta = delta
+            if not (eps is None):
+                if np.linalg.norm(self.weights - prev_weights) < eps:
+                    print(f"Algorithm converged after {i + 1} iterations")
+                    break
+                prev_weights = self.weights
 
-    def SGD(self, n_epochs=100, learning_rate=0.1, batch_size=1, random_state=None, eps=1e-6):
+    def SGD(self, n_epochs=100, learning_rate=0.1, batch_size=1, random_state=None, eps=None):
         # based on https://realpython.com/gradient-descent-algorithm-python/
 
         n_obs = self.X.shape[0]
-        n_vars = self.X.shape[1]
         xy = np.c_[self.X.reshape(n_obs, -1), self.y.reshape(n_obs, 1)]
 
         # random number generator for permutation of observations
@@ -155,10 +160,14 @@ class LogisticModel:
                 "the number of observations!"
             )
 
+        if not (eps is None):
+            prev_weights = self.weights
+
         for i in range(n_epochs):
             rng.shuffle(xy)
             batch_division = np.arange(batch_size, n_obs, batch_size)
             xy_batches = np.split(xy, batch_division)
+
             for n_batch in range(len(batch_division)):
                 x_batch, y_batch = xy_batches[n_batch][:, :-1], xy_batches[n_batch][:, -1:]
                 prediction = predict_probabilities(self.weights, x_batch)
@@ -168,3 +177,8 @@ class LogisticModel:
                 )
 
                 self.weights -= delta * learning_rate
+            if not (eps is None):
+                if np.linalg.norm(self.weights - prev_weights) < eps:
+                    print(f"Algorithm converged after {i + 1} iterations")
+                    break
+                prev_weights = self.weights
