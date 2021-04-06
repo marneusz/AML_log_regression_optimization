@@ -122,14 +122,20 @@ class LogisticModel:
                 break
             prev_delta = delta
 
-    def GD(self, n_epochs=100, learning_rate=0.05):
-        for _ in range(n_epochs):
+    def GD(self, n_epochs=100, learning_rate=0.05, eps=1e-06):
+        prev_delta = np.zeros(self.X.shape[1]).reshape(self.X.shape[1], 1)
+        for i in range(n_epochs):
             prediction = predict_probabilities(self.weights, self.X)
             delta = np.matmul(
                 self.X.transpose(),
                 (prediction - self.y) * prediction * (1 - prediction),
             )
             self.weights -= delta * learning_rate
+
+            if np.linalg.norm(delta - prev_delta) < eps:
+                print(f"Algorithm converged after {i+1} iterations")
+                break
+            prev_delta = delta
 
     def SGD(self, n_epochs=100, learning_rate=0.1, batch_size=1, random_state=None, eps=1e-6):
         # based on https://realpython.com/gradient-descent-algorithm-python/
@@ -153,7 +159,6 @@ class LogisticModel:
             rng.shuffle(xy)
             batch_division = np.arange(batch_size, n_obs, batch_size)
             xy_batches = np.split(xy, batch_division)
-            prev_weights = self.weights
             for n_batch in range(len(batch_division)):
                 x_batch, y_batch = xy_batches[n_batch][:, :-1], xy_batches[n_batch][:, -1:]
                 prediction = predict_probabilities(self.weights, x_batch)
