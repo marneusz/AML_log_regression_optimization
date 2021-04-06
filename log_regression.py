@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from copy import copy
 
 # Following functions can be placed in class LogisticModel
 
@@ -14,7 +15,7 @@ def sigmoid(x):
 
 
 def predict_probabilities(beta, x):
-    z = np.dot(x, beta)
+    z = np.dot(x, beta).reshape(x.shape[0], 1)
     return np.apply_along_axis(sigmoid, axis=1, arr=z)
 
 
@@ -86,7 +87,7 @@ class LogisticModel:
         self.X = np.c_[np.ones((X.shape[0], 1)), np.array(X)]  # adding bias
         self.y = np.array(y)
         self.opt_alg = opt_alg
-        self.weights = np.random.randn(self.X.shape[1], 1)
+        self.weights = np.zeros((self.X.shape[1], 1))
 
     def fit(self, X: pd.DataFrame, return_probabilities: bool = False) -> pd.DataFrame:
         """
@@ -103,24 +104,33 @@ class LogisticModel:
                 np.round, arr=predict_probabilities(self.weights, X), axis=1
             )
 
-    def IRLS(self, n_epochs, eps):
-        # IN PROGRESS...
+    def IRLS(self, n_epochs=100, eps=None, print_progress=False):
         # based on chapter 4.3.3 from Bishop - Pattern Recognition And Machine Learning
+        if not (eps is None):
+            prev_weights = copy(self.weights)
+
         y = self.y.reshape(self.y.size, 1)
-        prev_delta = np.zeros(self.X.shape[1]).reshape(self.X.shape[1], 1)
         for i in range(n_epochs):
             y_ = predict_probabilities(self.weights, self.X)
             R = np.identity(y_.size)
             R = R * (y_ * (1 - y_))
             delta = np.linalg.inv(self.X.T.dot(R).dot(self.X)).dot(self.X.T.dot(y_ - y))
-            if np.linalg.norm(delta - prev_delta) < eps:
-                # maybe some info about number of iterations
-                break
             self.weights -= delta
-            prev_delta = delta
 
-    def GD(self, n_epochs=100, learning_rate=0.05):
-        for _ in range(n_epochs):
+            if print_progress:
+                print(f"Number of epoch: {i+1}/{n_epochs}")
+
+            if not (eps is None):
+                if np.linalg.norm(self.weights - prev_weights) < eps:
+                    print(f"Algorithm converged after {i + 1} iterations")
+                    break
+                prev_weights = copy(self.weights)
+
+    def GD(self, n_epochs=100, learning_rate=0.05, eps=None):
+        if not (eps is None):
+            prev_weights = copy(self.weights)
+
+        for i in range(n_epochs):
             prediction = predict_probabilities(self.weights, self.X)
             delta = np.matmul(
                 self.X.transpose(),
@@ -128,5 +138,48 @@ class LogisticModel:
             )
             self.weights -= delta * learning_rate
 
-    def SGD(self, n_epochs, learning_rate):
-        pass
+            if not (eps is None):
+                if np.linalg.norm(self.weights - prev_weights) < eps:
+                    print(f"Algorithm converged after {i + 1} iterations")
+                    break
+                prev_weights = copy(self.weights)
+
+    def SGD(self, n_epochs=100, learning_rate=0.1, batch_size=1, random_state=None, eps=None):
+        # based on https://realpython.com/gradient-descent-algorithm-python/
+
+        n_obs = self.X.shape[0]
+        xy = np.c_[self.X.reshape(n_obs, -1), self.y.reshape(n_obs, 1)]
+
+        # random number generator for permutation of observations
+        seed = None if random_state is None else int(random_state)
+        rng = np.random.default_rng(seed=seed)
+
+        batch_size = int(batch_size)
+        if not 0 < batch_size <= n_obs:
+            raise ValueError(
+                "Batch size must be greater than zero and not greater than"
+                "the number of observations!"
+            )
+
+        if not (eps is None):
+            prev_weights = copy(self.weights)
+
+        for i in range(n_epochs):
+            rng.shuffle(xy)
+            batch_division = np.arange(batch_size, n_obs, batch_size)
+            xy_batches = np.split(xy, batch_division)
+
+            for n_batch in range(len(batch_division)):
+                x_batch, y_batch = xy_batches[n_batch][:, :-1], xy_batches[n_batch][:, -1:]
+                prediction = predict_probabilities(self.weights, x_batch)
+                delta = np.matmul(
+                    x_batch.transpose(),
+                    (prediction - y_batch) * prediction * (1 - prediction),
+                )
+
+                self.weights -= delta * learning_rate
+            if not (eps is None):
+                if np.linalg.norm(self.weights - prev_weights) < eps:
+                    print(f"Algorithm converged after {i + 1} iterations")
+                    break
+                prev_weights = copy(self.weights)
