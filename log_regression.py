@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from copy import copy
 
 # Following functions can be placed in class LogisticModel
 
@@ -106,7 +107,7 @@ class LogisticModel:
     def IRLS(self, n_epochs=100, eps=None, print_progress=False):
         # based on chapter 4.3.3 from Bishop - Pattern Recognition And Machine Learning
         if not (eps is None):
-            prev_weights = self.weights
+            prev_weights = copy(self.weights)
 
         y = self.y.reshape(self.y.size, 1)
         for i in range(n_epochs):
@@ -123,11 +124,11 @@ class LogisticModel:
                 if np.linalg.norm(self.weights - prev_weights) < eps:
                     print(f"Algorithm converged after {i + 1} iterations")
                     break
-                prev_weights = self.weights
+                prev_weights = copy(self.weights)
 
     def GD(self, n_epochs=100, learning_rate=0.05, eps=None):
         if not (eps is None):
-            prev_weights = self.weights
+            prev_weights = copy(self.weights)
 
         for i in range(n_epochs):
             prediction = predict_probabilities(self.weights, self.X)
@@ -141,7 +142,7 @@ class LogisticModel:
                 if np.linalg.norm(self.weights - prev_weights) < eps:
                     print(f"Algorithm converged after {i + 1} iterations")
                     break
-                prev_weights = self.weights
+                prev_weights = copy(self.weights)
 
     def SGD(self, n_epochs=100, learning_rate=0.1, batch_size=1, random_state=None, eps=None):
         # based on https://realpython.com/gradient-descent-algorithm-python/
@@ -161,7 +162,7 @@ class LogisticModel:
             )
 
         if not (eps is None):
-            prev_weights = self.weights
+            prev_weights = copy(self.weights)
 
         for i in range(n_epochs):
             rng.shuffle(xy)
@@ -181,4 +182,4 @@ class LogisticModel:
                 if np.linalg.norm(self.weights - prev_weights) < eps:
                     print(f"Algorithm converged after {i + 1} iterations")
                     break
-                prev_weights = self.weights
+                prev_weights = copy(self.weights)
