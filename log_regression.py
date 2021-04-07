@@ -121,7 +121,7 @@ class LogisticModel:
             R = R * (y_ * (1 - y_))
             delta = np.linalg.inv(self.X.T.dot(R).dot(self.X)).dot(self.X.T.dot(y_ - y))
             self.weights -= delta
-            print(self.weights)
+
             if print_progress:
                 print(f"Number of epoch: {i+1}/{n_epochs}")
 
