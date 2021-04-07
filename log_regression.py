@@ -193,4 +193,4 @@ class LogisticModel:
         """Returns the log-likelihood value for the model, based on weights"""
         sigm = predict_probabilities(self.weights, self.X)  # sigmoid(beta * x)
         temp = self.y * np.log(sigm) + (1 - self.y) * np.log(1 - sigm)
-        return - np.sum(temp)
+        return np.sum(temp)
