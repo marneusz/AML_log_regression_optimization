@@ -3,3 +3,4 @@
 tests.ipynb
 .ipynb_checkpoints/tests-checkpoint.ipynb
 __pycache__/log_regression.cpython-38.pyc
+*-checkpoint.ipynb
