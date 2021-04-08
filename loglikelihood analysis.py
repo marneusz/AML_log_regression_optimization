@@ -73,11 +73,11 @@ axs[0][1].set_title("Accuracy")
 axs[0][1].legend()
 
 for label in recalls.columns:
-    axs[1][1].plot(epochs, accuracies[label], label=label)
+    axs[1][1].plot(epochs, recalls[label], label=label)
 axs[1][1].set_title("Recall")
 axs[1][1].legend()
 
 for label in precisions.columns:
-    axs[1][0].plot(epochs, accuracies[label], label=label)
+    axs[1][0].plot(epochs, precisions[label], label=label)
 axs[1][0].set_title("Precision")
 axs[1][0].legend()
