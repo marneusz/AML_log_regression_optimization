@@ -83,7 +83,7 @@ def F_measure(y: np.array, prediction: np.array) -> float:
 
 
 class LogisticModel:
-    def __init__(self, X: pd.DataFrame, y: pd.DataFrame, opt_alg=None):
+    def __init__(self, X: pd.DataFrame, y: pd.DataFrame, random_state: int = None):
         self.var_names = X.columns
         self.scaler = MinMaxScaler()
         X = self.scaler.fit_transform(X)
@@ -92,7 +92,7 @@ class LogisticModel:
         y = MinMaxScaler().fit_transform(y)
         self.X = np.c_[np.ones((X.shape[0], 1)), np.array(X)]  # adding bias
         self.y = np.array(y)
-        self.opt_alg = opt_alg
+        self.seed = None if random_state is None else int(random_state)
         self.weights = np.zeros((self.X.shape[1], 1))
 
     def fit(self, X: pd.DataFrame, return_probabilities: bool = False) -> pd.DataFrame:
@@ -121,11 +121,13 @@ class LogisticModel:
             y_ = predict_probabilities(self.weights, self.X)
             R = np.identity(y_.size)
             R = R * (y_ * (1 - y_))
-            delta = np.linalg.inv(self.X.T.dot(R).dot(self.X)).dot(self.X.T.dot(y_ - y))
+            delta = np.linalg.pinv(self.X.T.dot(R).dot(self.X)).dot(
+                self.X.T.dot(y_ - y)
+            )
             self.weights -= delta
 
             if print_progress:
-                print(f"Number of epoch: {i+1}/{n_epochs}")
+                print(f"Number of epoch: {i + 1}/{n_epochs}")
 
             if not (eps is None):
                 if np.linalg.norm(self.weights - prev_weights) < eps:
@@ -160,8 +162,7 @@ class LogisticModel:
         xy = np.c_[self.X.reshape(n_obs, -1), self.y.reshape(n_obs, 1)]
 
         # random number generator for permutation of observations
-        seed = None if random_state is None else int(random_state)
-        rng = np.random.default_rng(seed=seed)
+        rng = np.random.default_rng(seed=self.seed)
 
         batch_size = int(batch_size)
         if not 0 < batch_size <= n_obs:
@@ -200,4 +201,4 @@ class LogisticModel:
         """Returns the log-likelihood value for the model, based on weights"""
         sigm = predict_probabilities(self.weights, self.X)  # sigmoid(beta * x)
         temp = self.y * np.log(sigm) + (1 - self.y) * np.log(1 - sigm)
-        return np.sum(temp)
+        return float(np.sum(temp))
