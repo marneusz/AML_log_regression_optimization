@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from copy import copy
 from sklearn.preprocessing import MinMaxScaler
+
 # Following functions can be placed in class LogisticModel
 
 
@@ -50,8 +51,8 @@ def precision(y: np.array, prediction: np.array) -> float:
     :param prediction: prediciton (0 and 1)
     :return: precision
     """
-    true_positives = np.sum((y == 1) & (prediction == 1))
-    positives = np.sum(prediction)
+    true_positives = float(np.sum((y == 1) & (prediction == 1)))
+    positives = float(np.sum(prediction))
     return 0 if positives == 0 else true_positives / positives
 
 
@@ -63,8 +64,8 @@ def recall(y: np.array, prediction: np.array) -> float:
     :param prediction: prediciton (0 and 1)
     :return: recall
     """
-    true_positives = np.sum((y == 1) & (prediction == 1))
-    true_values = np.sum(y)
+    true_positives = float(np.sum((y == 1) & (prediction == 1)))
+    true_values = float(np.sum(y))
     return 0 if true_values == 0 else true_positives / true_values
 
 
@@ -93,6 +94,7 @@ class LogisticModel:
         self.y = np.array(y)
         self.opt_alg = opt_alg
         self.weights = np.zeros((self.X.shape[1], 1))
+
     def fit(self, X: pd.DataFrame, return_probabilities: bool = False) -> pd.DataFrame:
         """
         Returns class to which t
@@ -149,7 +151,9 @@ class LogisticModel:
                     break
                 prev_weights = copy(self.weights)
 
-    def SGD(self, n_epochs=100, learning_rate=0.1, batch_size=1, random_state=None, eps=None):
+    def SGD(
+        self, n_epochs=100, learning_rate=0.1, batch_size=1, random_state=None, eps=None
+    ):
         # based on https://realpython.com/gradient-descent-algorithm-python/
 
         n_obs = self.X.shape[0]
@@ -175,7 +179,10 @@ class LogisticModel:
             xy_batches = np.split(xy, batch_division)
 
             for n_batch in range(len(batch_division)):
-                x_batch, y_batch = xy_batches[n_batch][:, :-1], xy_batches[n_batch][:, -1:]
+                x_batch, y_batch = (
+                    xy_batches[n_batch][:, :-1],
+                    xy_batches[n_batch][:, -1:],
+                )
                 prediction = predict_probabilities(self.weights, x_batch)
                 delta = np.matmul(
                     x_batch.transpose(),
@@ -188,3 +195,9 @@ class LogisticModel:
                     print(f"Algorithm converged after {i + 1} iterations")
                     break
                 prev_weights = copy(self.weights)
+
+    def log_likelihood(self) -> float:
+        """Returns the log-likelihood value for the model, based on weights"""
+        sigm = predict_probabilities(self.weights, self.X)  # sigmoid(beta * x)
+        temp = self.y * np.log(sigm) + (1 - self.y) * np.log(1 - sigm)
+        return np.sum(temp)
