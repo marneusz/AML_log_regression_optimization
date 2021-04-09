@@ -202,3 +202,16 @@ class LogisticModel:
         sigm = predict_probabilities(self.weights, self.X)  # sigmoid(beta * x)
         temp = self.y * np.log(sigm) + (1 - self.y) * np.log(1 - sigm)
         return float(np.sum(temp))
+
+    def R2_measure(self) -> float:
+        """Returns R2 measure defined as 1 - loglikelihood(model)/loglikelihood(null_model)"""
+
+        log_likelihood = self.log_likelihood()
+        pi = np.mean(self.y)
+        null_intercept = np.log(pi/(1 - pi))
+        weights_null = np.zeros(self.weights.shape)
+        weights_null[0] = null_intercept
+        prediction_null = predict_probabilities(weights_null, self.X)
+        log_likelihood_null = np.sum(self.y * np.log(prediction_null) + (1 - self.y) * np.log(1 - prediction_null))
+        return 0 if np.all(log_likelihood_null) == 0 else 1 - log_likelihood / log_likelihood_null
+
