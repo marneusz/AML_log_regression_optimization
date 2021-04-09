@@ -154,7 +154,7 @@ class LogisticModel:
                 prev_weights = copy(self.weights)
 
     def SGD(
-        self, n_epochs=100, learning_rate=0.1, batch_size=1, random_state=None, eps=None
+        self, n_epochs=100, learning_rate=0.1, batch_size=32, random_state=None, eps=None
     ):
         # based on https://realpython.com/gradient-descent-algorithm-python/
 
