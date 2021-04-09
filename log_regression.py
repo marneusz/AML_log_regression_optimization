@@ -83,7 +83,7 @@ def F_measure(y: np.array, prediction: np.array) -> float:
 
 
 class LogisticModel:
-    def __init__(self, X: pd.DataFrame, y: pd.DataFrame, random_state: int):
+    def __init__(self, X: pd.DataFrame, y: pd.DataFrame, random_state: int = None):
         self.var_names = X.columns
         self.scaler = MinMaxScaler()
         X = self.scaler.fit_transform(X)
@@ -121,11 +121,13 @@ class LogisticModel:
             y_ = predict_probabilities(self.weights, self.X)
             R = np.identity(y_.size)
             R = R * (y_ * (1 - y_))
-            delta = np.linalg.pinv(self.X.T.dot(R).dot(self.X)).dot(self.X.T.dot(y_ - y))
+            delta = np.linalg.pinv(self.X.T.dot(R).dot(self.X)).dot(
+                self.X.T.dot(y_ - y)
+            )
             self.weights -= delta
 
             if print_progress:
-                print(f"Number of epoch: {i+1}/{n_epochs}")
+                print(f"Number of epoch: {i + 1}/{n_epochs}")
 
             if not (eps is None):
                 if np.linalg.norm(self.weights - prev_weights) < eps:
@@ -195,8 +197,8 @@ class LogisticModel:
                     break
                 prev_weights = copy(self.weights)
 
-    def log_likelihood(self) -> np.array:
+    def log_likelihood(self) -> float:
         """Returns the log-likelihood value for the model, based on weights"""
         sigm = predict_probabilities(self.weights, self.X)  # sigmoid(beta * x)
         temp = self.y * np.log(sigm) + (1 - self.y) * np.log(1 - sigm)
-        return np.sum(temp)
+        return float(np.sum(temp))
