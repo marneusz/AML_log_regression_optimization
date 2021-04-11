@@ -83,5 +83,5 @@ def plot_measures(
     axs[1][0].set_title("Precision")
     axs[1][0].legend()
 
-
-plot_measures()
+if __name__ == '__main__':
+    plot_measures()
