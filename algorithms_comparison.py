@@ -17,6 +17,7 @@ def optimal_KNN(X_train: pd.DataFrame,
                 metric=accuracy,
                 max_neighbors: int = 50,
                 step: int = 1,
+                verbose = False
                 ):
     measures = []
     for i in range(1, max_neighbors, step):
@@ -24,7 +25,8 @@ def optimal_KNN(X_train: pd.DataFrame,
         y_pred = KNN_model.predict(X_test).reshape(-1,1)
         measures.append(float(metric(y_test, y_pred)))
     best_K = measures.index(max(measures))
-    print("Maximum metric: ", max(measures), " at K = ", best_K)
+    if verbose:
+        print("Maximum metric: ", max(measures), " at K = ", best_K)
     return best_K
 
 

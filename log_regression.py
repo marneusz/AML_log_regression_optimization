@@ -131,7 +131,8 @@ class LogisticModel:
 
             if not (eps is None):
                 if np.linalg.norm(self.weights - prev_weights) < eps:
-                    print(f"Algorithm converged after {i + 1} iterations")
+                    if print_progress:
+                        print(f"Algorithm converged after {i + 1} iterations")
                     break
                 prev_weights = copy(self.weights)
 
