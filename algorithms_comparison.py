@@ -35,6 +35,7 @@ def plot_algorithms_comparison(
     target_name="Maligant",
     print_progress=False,
     eps=1e-8,
+    figsize=(10, 6)
 ):
     X = dataset.drop(columns=target_name)
     y = dataset[[target_name]]
@@ -153,7 +154,7 @@ def plot_algorithms_comparison(
     )
     R2_measures = list(map(float, R2_measures))
 
-    fig, axs = plt.subplots(3, 2, figsize=(16, 12))
+    fig, axs = plt.subplots(3, 2, figsize=figsize)
 
     axs[0][0].barh(list(reversed(algorithms)),
                    list(reversed(accuracies)),

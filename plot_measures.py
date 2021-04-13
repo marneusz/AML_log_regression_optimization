@@ -17,6 +17,7 @@ def plot_measures(
     ),
     dataset=pd.read_csv(f"data/after preprocessing/breast_cancer.csv"),
     target_name="Maligant",
+    figsize=(10, 6)
 ):
     X = dataset.drop(columns=target_name)
     y = dataset[[target_name]]
@@ -64,7 +65,7 @@ def plot_measures(
             },
             ignore_index=True,
         )
-    fig, axs = plt.subplots(2, 2, figsize=(10, 8))
+    fig, axs = plt.subplots(2, 2, figsize=figsize)
     for label in loglikelihoods.columns:
         axs[0][0].plot(epochs, loglikelihoods[label], label=label)
     axs[0][0].set_ylim((loglikelihoods.min().min(), 0))
