@@ -1,7 +1,7 @@
 # Logistic Regression - Optimization Algorithms
 
 ## Report
-`Project 1.pdf`
+`report.pdf`
 
 ## Slides
 https://docs.google.com/presentation/d/1MYYm1L98OY2VQGRVKJysGRLpjssXdyBxnZQvUW8zgK0/edit?usp=sharing
