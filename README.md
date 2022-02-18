@@ -1,4 +1,4 @@
-# AML_log_regression_optimization
+# Logistic Regression - Optimization Algorithms
 
 ## Report
 `Project 1.pdf`
