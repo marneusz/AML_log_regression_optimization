@@ -1,6 +1,9 @@
 # AML_log_regression_optimization
 
-## slides:
+## Report
+`Project 1.pdf`
+
+## Slides
 https://docs.google.com/presentation/d/1MYYm1L98OY2VQGRVKJysGRLpjssXdyBxnZQvUW8zgK0/edit?usp=sharing
 
 The aim of the project is to implement different optimization algorithms for logistic regression and  compare their performance. 
